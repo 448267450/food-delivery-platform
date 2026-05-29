@@ -1,0 +1,27 @@
+# Binaries
+*.exe
+*.out
+/bin/
+
+# Build output
+dist/
+
+# Environment files
+.env
+.env.local
+*.env
+
+# Config overrides (keep config.yaml template, ignore local overrides)
+config/config.local.yaml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go
+vendor/
