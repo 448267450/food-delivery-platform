@@ -4,16 +4,17 @@ import "time"
 
 // OrderStatus represents the state machine for an order
 // Flow: PENDING -> PAID -> PREPARING -> OUT_FOR_DELIVERY -> DELIVERED
-//                       -> CANCELLED (from PENDING or PAID only)
+//
+//	-> CANCELLED (from PENDING or PAID only)
 type OrderStatus string
 
 const (
-	StatusPending         OrderStatus = "PENDING"          // order created, awaiting payment
-	StatusPaid            OrderStatus = "PAID"             // payment confirmed
-	StatusPreparing       OrderStatus = "PREPARING"        // restaurant is preparing
-	StatusOutForDelivery  OrderStatus = "OUT_FOR_DELIVERY" // driver picked up
-	StatusDelivered       OrderStatus = "DELIVERED"        // successfully delivered
-	StatusCancelled       OrderStatus = "CANCELLED"        // cancelled
+	StatusPending        OrderStatus = "PENDING"          // order created, awaiting payment
+	StatusPaid           OrderStatus = "PAID"             // payment confirmed
+	StatusPreparing      OrderStatus = "PREPARING"        // restaurant is preparing
+	StatusOutForDelivery OrderStatus = "OUT_FOR_DELIVERY" // driver picked up
+	StatusDelivered      OrderStatus = "DELIVERED"        // successfully delivered
+	StatusCancelled      OrderStatus = "CANCELLED"        // cancelled
 )
 
 // ValidTransitions defines allowed state transitions
