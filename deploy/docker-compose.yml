@@ -33,20 +33,20 @@ services:
       postgres:
         condition: service_healthy
 
-  # restaurant-service:
-  #   build:
-  #     context: ../
-  #     dockerfile: ./deploy/Dockerfile.restaurant
-  #   ports:
-  #     - "8082:8082"
-  #   environment:
-  #     DATABASE_HOST: postgres
-  #     DATABASE_USER: postgres
-  #     DATABASE_PASSWORD: postgres
-  #     DATABASE_DBNAME: food_delivery_restaurants
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
+  restaurant-service:
+    build:
+      context: ../
+      dockerfile: ./deploy/Dockerfile.restaurant
+    ports:
+      - "8082:8082"
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_DBNAME: food_delivery_restaurants
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   # order-service:
   #   build:
