@@ -2,7 +2,7 @@
 
 A production-grade food delivery backend inspired by **Uber Eats**, built with Go and microservices architecture.
 
-> This project is a long-term learning journey — progressively adopting technologies used at scale: gRPC, Kafka, Redis, OpenTelemetry, and Kubernetes.
+> Long-term learning project — progressively adopting technologies used at scale: gRPC, Kafka, Redis, OpenTelemetry, and Kubernetes.
 
 ---
 
@@ -26,18 +26,18 @@ A production-grade food delivery backend inspired by **Uber Eats**, built with G
 
 ## Services
 
-| Service | Port | Description |
-|---|---|---|
-| user-service | 8081 | Registration, login, JWT auth |
-| restaurant-service | 8082 | Restaurant and menu management |
-| order-service | 8083 | Order lifecycle + state machine |
+| Service | Port | Status | Description |
+|---|---|---|---|
+| user-service | 8081 | ✅ Live | Registration, login, JWT auth |
+| restaurant-service | 8082 | ✅ Live | Restaurant and menu management |
+| order-service | 8083 | 🚧 In Progress | Order lifecycle + state machine |
 
 ---
 
 ## Tech Stack
 
 **Phase 1 (current)**
-- **Go 1.22** — core language
+- **Go 1.24** — core language
 - **Gin** — HTTP framework
 - **GORM** — ORM
 - **PostgreSQL** — primary database
@@ -61,29 +61,26 @@ A production-grade food delivery backend inspired by **Uber Eats**, built with G
 
 ### Prerequisites
 - Docker & Docker Compose
-- Go 1.22+
+- Go 1.24+
 
 ### Run locally
 
 ```bash
-# Clone the repo
 git clone https://github.com/448267450/food-delivery-platform.git
-cd food-delivery-platform
-
-# Start all services + PostgreSQL
-cd deploy && docker-compose up --build
+cd food-delivery-platform/deploy
+docker-compose up --build
 ```
 
 Services will be available at:
 - User Service: http://localhost:8081
 - Restaurant Service: http://localhost:8082
-- Order Service: http://localhost:8083
+- Order Service: http://localhost:8083 (coming soon)
 
 ---
 
 ## API Reference
 
-### User Service
+### User Service `:8081`
 
 ```bash
 # Health check
@@ -109,6 +106,52 @@ POST /api/v1/auth/login
 GET /api/v1/users/:id/profile
 ```
 
+### Restaurant Service `:8082`
+
+```bash
+# Health check
+GET /health
+
+# Create restaurant
+POST /api/v1/restaurants
+{
+  "owner_id": 1,
+  "name": "Ryan's Burger",
+  "description": "Best burgers in Austin",
+  "address": "123 Main St, Austin TX",
+  "phone": "512-000-1234"
+}
+
+# List all restaurants
+GET /api/v1/restaurants
+
+# Get restaurant detail (with menu items)
+GET /api/v1/restaurants/:id
+
+# Update restaurant
+PUT /api/v1/restaurants/:id
+{ "name": "New Name", "is_open": false }
+
+# Delete restaurant
+DELETE /api/v1/restaurants/:id
+
+# Add menu item
+POST /api/v1/restaurants/:id/menu
+{
+  "name": "Classic Cheeseburger",
+  "description": "Beef patty with cheddar",
+  "price": 12.99,
+  "category": "burger"
+}
+
+# Update menu item
+PUT /api/v1/restaurants/:id/menu/:itemId
+{ "price": 14.99, "is_available": false }
+
+# Delete menu item
+DELETE /api/v1/restaurants/:id/menu/:itemId
+```
+
 ---
 
 ## Order State Machine
@@ -125,16 +168,6 @@ Invalid transitions are rejected at the service layer.
 
 ---
 
-## Project Roadmap
-
-- [x] Phase 1: Single services with REST API
-- [ ] Phase 2: Microservices with gRPC + Kafka
-- [ ] Phase 3: Redis geolocation for driver matching
-- [ ] Phase 4: Observability with OpenTelemetry
-- [ ] Phase 5: K8s deployment with HPA
-
----
-
 ## Project Structure
 
 ```
@@ -144,16 +177,28 @@ food-delivery-platform/
 │   │   ├── cmd/main.go
 │   │   ├── config/
 │   │   └── internal/
-│   │       ├── handler/    # HTTP layer
-│   │       ├── service/    # Business logic
-│   │       ├── repository/ # Database layer
-│   │       └── model/      # Data models
-│   ├── restaurant-service/
-│   └── order-service/
-├── pkg/                    # Shared utilities
-├── deploy/                 # Docker, K8s configs
+│   │       ├── handler/      # HTTP layer
+│   │       ├── service/      # Business logic
+│   │       ├── repository/   # Database layer
+│   │       └── model/        # Data models
+│   ├── restaurant-service/   # Same structure as user-service
+│   └── order-service/        # In progress
+├── deploy/                   # Docker Compose, Dockerfiles
 └── go.mod
 ```
+
+---
+
+## Project Roadmap
+
+- [x] Phase 1a: user-service — register, login, JWT auth
+- [x] Phase 1b: restaurant-service — CRUD + menu management
+- [ ] Phase 1c: order-service — order lifecycle + state machine
+- [ ] Phase 2: gRPC inter-service communication
+- [ ] Phase 2: Kafka async messaging (order events)
+- [ ] Phase 3: Redis geolocation for driver matching
+- [ ] Phase 4: OpenTelemetry + Jaeger distributed tracing
+- [ ] Phase 5: Kubernetes deployment with HPA
 
 ---
 
