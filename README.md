@@ -30,7 +30,7 @@ A production-grade food delivery backend inspired by **Uber Eats**, built with G
 |---|---|---|---|
 | user-service | 8081 | ✅ Live | Registration, login, JWT auth |
 | restaurant-service | 8082 | ✅ Live | Restaurant and menu management |
-| order-service | 8083 | 🚧 In Progress | Order lifecycle + state machine |
+| order-service | 8083 | ✅ Live | Order lifecycle + state machine |
 
 ---
 
@@ -74,7 +74,7 @@ docker-compose up --build
 Services will be available at:
 - User Service: http://localhost:8081
 - Restaurant Service: http://localhost:8082
-- Order Service: http://localhost:8083 (coming soon)
+- Order Service: http://localhost:8083
 
 ---
 
@@ -152,11 +152,51 @@ PUT /api/v1/restaurants/:id/menu/:itemId
 DELETE /api/v1/restaurants/:id/menu/:itemId
 ```
 
+### Order Service `:8083`
+
+```bash
+# Health check
+GET /health
+
+# Create order
+POST /api/v1/orders
+{
+  "user_id": 1,
+  "restaurant_id": 1,
+  "delivery_address": "456 Oak Ave, Austin TX",
+  "note": "No onions please",
+  "items": [
+    {
+      "menu_item_id": 1,
+      "name": "Classic Cheeseburger",
+      "price": 12.99,
+      "quantity": 2
+    }
+  ]
+}
+
+# Get order by ID (with items)
+GET /api/v1/orders/:id
+
+# Get all orders for a user
+GET /api/v1/orders/user/:userId
+
+# Get all orders for a restaurant
+GET /api/v1/orders/restaurant/:restaurantId
+
+# Update order status (state machine)
+PUT /api/v1/orders/:id/status
+{ "status": "PAID" }
+
+# Cancel order
+DELETE /api/v1/orders/:id
+```
+
 ---
 
 ## Order State Machine
 
-Orders follow a strict state transition flow:
+Orders follow a strict state transition flow — invalid transitions are rejected at the service layer:
 
 ```
 PENDING ──▶ PAID ──▶ PREPARING ──▶ OUT_FOR_DELIVERY ──▶ DELIVERED
@@ -164,7 +204,14 @@ PENDING ──▶ PAID ──▶ PREPARING ──▶ OUT_FOR_DELIVERY ──▶ 
    └──────────┴──▶ CANCELLED
 ```
 
-Invalid transitions are rejected at the service layer.
+| From | Allowed Transitions |
+|---|---|
+| PENDING | PAID, CANCELLED |
+| PAID | PREPARING, CANCELLED |
+| PREPARING | OUT_FOR_DELIVERY |
+| OUT_FOR_DELIVERY | DELIVERED |
+| DELIVERED | — (terminal) |
+| CANCELLED | — (terminal) |
 
 ---
 
@@ -181,8 +228,8 @@ food-delivery-platform/
 │   │       ├── service/      # Business logic
 │   │       ├── repository/   # Database layer
 │   │       └── model/        # Data models
-│   ├── restaurant-service/   # Same structure as user-service
-│   └── order-service/        # In progress
+│   ├── restaurant-service/   # Same structure
+│   └── order-service/        # Same structure + state machine
 ├── deploy/                   # Docker Compose, Dockerfiles
 └── go.mod
 ```
@@ -193,10 +240,11 @@ food-delivery-platform/
 
 - [x] Phase 1a: user-service — register, login, JWT auth
 - [x] Phase 1b: restaurant-service — CRUD + menu management
-- [ ] Phase 1c: order-service — order lifecycle + state machine
-- [ ] Phase 2: gRPC inter-service communication
-- [ ] Phase 2: Kafka async messaging (order events)
-- [ ] Phase 3: Redis geolocation for driver matching
+- [x] Phase 1c: order-service — order lifecycle + state machine
+- [ ] Phase 2a: gRPC inter-service communication
+- [ ] Phase 2b: Kafka async messaging (order created events)
+- [ ] Phase 3a: Redis geolocation for driver matching
+- [ ] Phase 3b: Rate limiting + API Gateway
 - [ ] Phase 4: OpenTelemetry + Jaeger distributed tracing
 - [ ] Phase 5: Kubernetes deployment with HPA
 

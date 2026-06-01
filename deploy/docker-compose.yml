@@ -48,20 +48,20 @@ services:
       postgres:
         condition: service_healthy
 
-  # order-service:
-  #   build:
-  #     context: ../
-  #     dockerfile: ./deploy/Dockerfile.order
-  #   ports:
-  #     - "8083:8083"
-  #   environment:
-  #     DATABASE_HOST: postgres
-  #     DATABASE_USER: postgres
-  #     DATABASE_PASSWORD: postgres
-  #     DATABASE_DBNAME: food_delivery_orders
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
+  order-service:
+    build:
+      context: ../
+      dockerfile: ./deploy/Dockerfile.order
+    ports:
+      - "8083:8083"
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_DBNAME: food_delivery_orders
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
